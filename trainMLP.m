@@ -10,8 +10,8 @@
 % Y_train -> Padrões de saída utilizados durante o treinamento
 % X_val -> Padrões de entrada utilizados na validação
 % Y_val -> Padrões de saída utilizados na validação
-function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors] = trainMLP(I, H, O, maxEpochs, eta, ...
-    activationType, X_train, Y_train, X_val, Y_val)
+function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors, trainingFinalPredictions, validationFinalPredictions] = trainMLP(I, H, O, maxEpochs, eta, ...
+    activationType, X_train, Y_train, X_val, Y_val, flag)
     currentEpoch = 1;    
     numberOfTrainingInstances = size(X_train, 2);
     numberOfValidationInstances = size(X_val, 2); 
@@ -20,8 +20,15 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
     % Init weights    
     Whi = rand(H, I) - 0.5;
     bias_hi = rand(H, 1) - 0.5;   
-    Woh = rand (O, H) - 0.5;
-    bias_oh = rand(O, 1) - 0.5;    
+    if(flag)        
+         Woh = zeros(O, H);
+         bias_oh = zeros(O, 1); 
+    else
+         Woh = rand (O, H) - 0.5;
+         bias_oh = rand(O, 1) - 0.5; 
+    end
+    %Woh = rand (O, H) - 0.5;
+    %bias_oh = rand(O, 1) - 0.5;    
     
     while currentEpoch <= maxEpochs       
         trainingPredictions = zeros(O, numberOfTrainingInstances);
@@ -75,6 +82,8 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
     
     finalErrors = errors;
     finalValErrors = validationErrors;
+    trainingFinalPredictions = trainingPredictions;
+    validationFinalPredictions = validationPredictions;
     hiddenVsInputWeights = Whi;
     hiddenVsInputBias = bias_hi;
     outputVsHiddenWeights = Woh;
