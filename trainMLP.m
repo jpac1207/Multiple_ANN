@@ -39,11 +39,17 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
             Yh = activation(activationType, net_h);
             % ------- Output Layer -------
             net_o = Woh * Yh + bias_oh * ones(1, size (Yh, 2));
-            Y_net = exp(net_o)./sum(exp(net_o));   % Aplicação da softmax      
-            trainingPredictions(:, i) = Y_net;
-            E = ((-1).*sum((Y_train(:, i).*log(Y_net))));  % Computação do erro                   
-            %sprintf("%f", E);             
-            
+            Y_net = exp(net_o)./sum(exp(net_o));   % Aplicação da softmax       
+            if(flag)
+                Y_net = Y_net.*max(Y_train(:, i));
+            end
+            trainingPredictions(:, i) = Y_net;            
+            %E = ((-1).*sum((Y_train(:, i).*log(Y_net))));  % Computação do erro                 
+            %E = ((-max(Y_train(:, i))).*sum((Y_train(:, i) > 0).*log(Y_net)));  % Computação do erro 
+            E = ((-1).*sum((Y_train(:, i) > 0).*log(Y_net)));
+%             if(flag)        
+%                 E
+%             end
             % backward    
             df =  (Y_train(:, i)-Y_net);
             %df
@@ -61,6 +67,9 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
             Woh = Woh + delta_Woh;
             bias_oh = bias_oh + delta_bias_oh;      
         end       
+%         if(flag)
+%             pause()
+%         end
         %calculate error                          
         error = sum(((Y_train .* (1-trainingPredictions)).^2), 'all')/numberOfTrainingInstances;
         errors(currentEpoch) = error;

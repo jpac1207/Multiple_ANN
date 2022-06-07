@@ -1,6 +1,6 @@
 % ---------- Parâmetros Gerais ----------
 maxEpochs = 300; % Número de épocas do treinamento
-H = 7; % Número de neurônios na camada escondida
+H = 15; % Número de neurônios na camada escondida
 I = 30; % Número de neurônios na camada de entrada
 O = 6; % Número de neurônios na camada de saída
 eta = 0.05; % Learning Rate utilizado no cálculo do backpropagation.
@@ -20,20 +20,22 @@ function doTraining(maxEpochs, I, H, O, eta, eta_gaussian)
 %            X_train', Y_train, X_val', Y_val)
     start = 1
     [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors, trainingFinalPredictions, validationFinalPredictions] = trainMLP(I, H, O, maxEpochs, eta, ...
-        1, X_train', Y_train, X_val', Y_val, 0)     
-    errorPerInstance = (Y_train .* (1-trainingFinalPredictions)).^2
-    validationErrorPerInstance = (Y_val .* (1-validationFinalPredictions)).^2
+        1, X_train', Y_train, X_val', Y_val, 0);     
+    errorPerInstance = (Y_train .* (1-trainingFinalPredictions));
+    validationErrorPerInstance = (Y_val .* (1-validationFinalPredictions));
     allNetworksErrors(start:(start+maxEpochs-1), 1) = finalErrors;
     allNetworksValErrors(start:(start+maxEpochs-1), 1) = finalValErrors;
     start = start + maxEpochs;
-
-    [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors, trainingFinalPredictions, validationFinalPrediction] = trainMLP(I, H * 3, O, maxEpochs, eta * 0.5, ...
-        0, X_train', errorPerInstance, X_val', validationErrorPerInstance, 1)   
-    allNetworksErrors(start:(start+maxEpochs-1), 1) = finalErrors;
-    allNetworksValErrors(start:(start+maxEpochs-1), 1) = finalValErrors;
-    start = start + maxEpochs;
-
     trainingFinalPredictions
+    errorPerInstance
+    disp('---------------------')
+    [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors, trainingFinalPredictions, validationFinalPredictions] = trainMLP(I, H, O, maxEpochs, eta, ...
+        0, X_train', errorPerInstance, X_val', validationErrorPerInstance, 1);   
+    allNetworksErrors(start:(start+maxEpochs-1), 1) = finalErrors;
+    allNetworksValErrors(start:(start+maxEpochs-1), 1) = finalValErrors;
+    start = start + maxEpochs;
+
+    trainingFinalPredictions    
 
     plot((1:maxEpochs*2), allNetworksErrors, 'o');
     hold on;
