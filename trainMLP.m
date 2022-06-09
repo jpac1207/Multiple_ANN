@@ -66,7 +66,7 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
         end       
 
         %calculate error                          
-        error = sum(((Y_train .* (1-trainingPredictions)).^2), 'all')/numberOfTrainingInstances;
+        error = sum(((Y_train .* (Y_train-trainingPredictions)).^2), 'all')/numberOfTrainingInstances;
         errors(currentEpoch) = error;
         
          % Validação
@@ -82,7 +82,7 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
             validationPredictions(:, i) = val_Y_net;
             %---------------------------
         end
-        validationError = sum(((Y_val .* (1-validationPredictions)).^2), 'all')/numberOfValidationInstances;               
+        validationError = sum(((Y_val .* (Y_val-validationPredictions)).^2), 'all')/numberOfValidationInstances;               
         validationErrors(currentEpoch) = validationError;
         currentEpoch = currentEpoch + 1;
    end     
