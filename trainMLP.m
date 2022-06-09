@@ -11,7 +11,7 @@
 % X_val -> Padrões de entrada utilizados na validação
 % Y_val -> Padrões de saída utilizados na validação
 function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors, trainingFinalPredictions, validationFinalPredictions] = trainMLP(I, H, O, maxEpochs, eta, ...
-    activationType, X_train, Y_train, X_val, Y_val, flag)
+    activationType, X_train, Y_train, X_val, Y_val, isTheFirstNetwork)
     currentEpoch = 1;    
     numberOfTrainingInstances = size(X_train, 2);
     numberOfValidationInstances = size(X_val, 2); 
@@ -20,15 +20,13 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
     % Init weights    
     Whi = rand(H, I) - 0.5;
     bias_hi = rand(H, 1) - 0.5;   
-    if(flag)        
-         Woh = zeros(O, H);
-         bias_oh = zeros(O, 1); 
-    else
+    if(isTheFirstNetwork)        
          Woh = rand (O, H) - 0.5;
          bias_oh = rand(O, 1) - 0.5; 
-    end
-    %Woh = rand (O, H) - 0.5;
-    %bias_oh = rand(O, 1) - 0.5;    
+    else        
+         Woh = zeros(O, H);
+         bias_oh = zeros(O, 1);
+    end     
     
     while currentEpoch <= maxEpochs       
         trainingPredictions = zeros(O, numberOfTrainingInstances);
@@ -39,20 +37,19 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
             Yh = activation(activationType, net_h);
             % ------- Output Layer -------
             net_o = Woh * Yh + bias_oh * ones(1, size (Yh, 2));
-            Y_net = exp(net_o)./sum(exp(net_o));   % Aplicação da softmax       
-            if(flag)
+            Y_net = exp(net_o)./sum(exp(net_o));   % Aplicação da softmax   
+            % Adaptação da função softmax, de forma que a soma das
+            % probabilidades computadas seja igual ao valor desejado para a
+            % classe correta
+            if(~isTheFirstNetwork)
                 Y_net = Y_net.*max(Y_train(:, i));
             end
             trainingPredictions(:, i) = Y_net;            
-            %E = ((-1).*sum((Y_train(:, i).*log(Y_net))));  % Computação do erro                 
-            %E = ((-max(Y_train(:, i))).*sum((Y_train(:, i) > 0).*log(Y_net)));  % Computação do erro 
-            E = ((-1).*sum((Y_train(:, i) > 0).*log(Y_net)));
-%             if(flag)        
-%                 E
-%             end
+            %E = ((-1).*sum((Y_train(:, i).*log(Y_net))));  % Computação do erro                             
+            E = (-sum((Y_train(:, i) > 0).*log(Y_net)));
+        
             % backward    
-            df =  (Y_train(:, i)-Y_net);
-            %df
+            df =  (Y_train(:, i)-Y_net);           
             delta_bias_oh = eta * sum((E.*df)')';
             delta_Woh = eta * (E.*df)*Yh';
             Eh = (Woh')*(E.*df);
@@ -67,9 +64,7 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
             Woh = Woh + delta_Woh;
             bias_oh = bias_oh + delta_bias_oh;      
         end       
-%         if(flag)
-%             pause()
-%         end
+
         %calculate error                          
         error = sum(((Y_train .* (1-trainingPredictions)).^2), 'all')/numberOfTrainingInstances;
         errors(currentEpoch) = error;
@@ -80,7 +75,10 @@ function [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, output
             val_net_h = Whi * X_val(:, i) + bias_hi * ones(1, size(X_val(:, i), 2));
             val_Yh = activation(activationType, val_net_h);    
             val_net_o = Woh * val_Yh + bias_oh * ones(1, size (val_Yh, 2));        
-            val_Y_net = exp(val_net_o)./sum(exp(val_net_o));   
+            val_Y_net = exp(val_net_o)./sum(exp(val_net_o));
+            if(~isTheFirstNetwork)
+                val_Y_net = val_Y_net.*max(Y_val(:, i));
+            end
             validationPredictions(:, i) = val_Y_net;
             %---------------------------
         end
