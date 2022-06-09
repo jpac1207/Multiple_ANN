@@ -1,28 +1,8 @@
-% ---------- Parâmetros Gerais ----------
-maxEpochs = 300; % Número de épocas do treinamento
-H = 15; % Número de neurônios na camada escondida
-I = 30; % Número de neurônios na camada de entrada
-O = 6; % Número de neurônios na camada de saída
-eta = 0.05; % Learning Rate utilizado no cálculo do backpropagation.
 
-neuralNetworks(1).I = 30;
-neuralNetworks(1).H = 15;
-neuralNetworks(1).O = 6;
-neuralNetworks(1).eta = 0.05;
-neuralNetworks(1).numberOfEpochs = 300;
-neuralNetworks(1).isTheFirstNetwork = 1;
+neuralNetworks = getNeuralNetworks();
+doTraining(neuralNetworks)
 
-neuralNetworks(2).I = 30;
-neuralNetworks(2).H = 15;
-neuralNetworks(2).O = 6;
-neuralNetworks(2).eta = 0.05;
-neuralNetworks(2).numberOfEpochs = 200;
-neuralNetworks(2).isTheFirstNetwork = 0;
-
-%doTraining(maxEpochs, I, H, O, eta, eta_gaussian)
-doTraining2(neuralNetworks)
-
-function doTraining2(neuralNetworks)
+function doTraining(neuralNetworks)
     processed_dataset = load('processed_dataset.mat');
     X = processed_dataset.X;
     Y = processed_dataset.Y;
@@ -47,8 +27,8 @@ function doTraining2(neuralNetworks)
             neuralNetworks(i).eta, 0, X_train', Y_train, X_val', Y_val, neuralNetworks(i).isTheFirstNetwork);     
         allNetworksErrors(start:(start+neuralNetworks(i).numberOfEpochs-1), 1) = finalErrors;
         allNetworksValErrors(start:(start+neuralNetworks(i).numberOfEpochs-1), 1) = finalValErrors;
-        Y_train = (Y_train .* (1-trainingFinalPredictions));
-        Y_val = (Y_val .* (1-validationFinalPredictions));        
+        Y_train = (Y_train .* (max(Y_train)-trainingFinalPredictions))
+        Y_val = (Y_val .* (max(Y_val)-validationFinalPredictions));        
         start = start + neuralNetworks(i).numberOfEpochs;
         %trainingFinalPredictions
     end  
@@ -62,45 +42,30 @@ function doTraining2(neuralNetworks)
     title('Erros de Treino e Validação do Treinamento');  
 end
 
-function doTraining(maxEpochs, I, H, O, eta, eta_gaussian)
-    processed_dataset = load('processed_dataset.mat');
-    X = processed_dataset.X;
-    Y = processed_dataset.Y;
-    X_norm = normalizeInput(X);
-    [X_train, Y_train, X_val, Y_val, X_test, Y_test] = splitData(X_norm, Y);
-    allNetworksErrors = zeros(maxEpochs * 2, 1);
-    allNetworksValErrors = zeros(maxEpochs * 2, 1);
-%     [hiddenVsInputWeights, outputVsHiddenWeights, outputVsHiddenBias, sigmas, rbfFinalErrors, rbfFinalValErrors]  = trainRBF(I, H, O, maxEpochs, eta, eta_gaussian, ...
-%            X_train', Y_train, X_val', Y_val)
-    start = 1
-    [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors, trainingFinalPredictions, validationFinalPredictions] = trainMLP(I, H, O, maxEpochs, eta, ...
-        1, X_train', Y_train, X_val', Y_val, 0);     
-    errorPerInstance = (Y_train .* (1-trainingFinalPredictions));
-    validationErrorPerInstance = (Y_val .* (1-validationFinalPredictions));
-    allNetworksErrors(start:(start+maxEpochs-1), 1) = finalErrors;
-    allNetworksValErrors(start:(start+maxEpochs-1), 1) = finalValErrors;
-    start = start + maxEpochs;
-    trainingFinalPredictions
-    errorPerInstance
-    disp('---------------------')
-    [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, outputVsHiddenBias, finalErrors, finalValErrors, trainingFinalPredictions, validationFinalPredictions] = trainMLP(I, H * 2, O, maxEpochs, eta * 0.1, ...
-        0, X_train', errorPerInstance, X_val', validationErrorPerInstance, 1);   
-    allNetworksErrors(start:(start+maxEpochs-1), 1) = finalErrors;
-    allNetworksValErrors(start:(start+maxEpochs-1), 1) = finalValErrors;
-    start = start + maxEpochs;
+% Realiza o preenchimento do array 'neuralNetworks' com os parâmetros de
+% cada rede neural definidos como um atributo na respectiva struct
+function[neuralNetworks] = getNeuralNetworks()
+    neuralNetworks(1).I = 30;
+    neuralNetworks(1).H = 10;
+    neuralNetworks(1).O = 6;
+    neuralNetworks(1).eta = 0.1;
+    neuralNetworks(1).numberOfEpochs = 500;
+    neuralNetworks(1).isTheFirstNetwork = 1;
+    
+    neuralNetworks(2).I = 30;
+    neuralNetworks(2).H = 15;
+    neuralNetworks(2).O = 6;
+    neuralNetworks(2).eta = 0.05;
+    neuralNetworks(2).numberOfEpochs = 200;
+    neuralNetworks(2).isTheFirstNetwork = 0;
 
-    trainingFinalPredictions    
-
-    plot((1:maxEpochs*2), allNetworksErrors, 'o');
-    hold on;
-    plot((1:maxEpochs*2), allNetworksValErrors, 'x');
-    hold off; 
-    legend('Média Erros Treinamento MLP', 'Média Erros Validação MLP');
-    ylabel('Erro Quadrático Médio');
-    xlabel('Épocas');
-    title('Erros de Treino e Validação do Treinamento');
+    neuralNetworks(3).I = 30;
+    neuralNetworks(3).H = 25;
+    neuralNetworks(3).O = 6;
+    neuralNetworks(3).eta = 0.01;
+    neuralNetworks(3).numberOfEpochs = 100;
+    neuralNetworks(3).isTheFirstNetwork = 0;
 end
-
 
 % Realiza a divisão dos dados contidos em 'X' e 'Y' em:
 % X_train -> Padrões de entrada a serem utilizados no treino (70%)
