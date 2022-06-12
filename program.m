@@ -24,7 +24,7 @@ function doTraining(neuralNetworks)
     start = 1;
     
     % Salva informações básicas
-    save("./ann_weigths/basic_info", "neuralNetworksCount", "inputSize", "outputSize");
+    save("./ann_weights/basic_info", "neuralNetworksCount", "inputSize", "outputSize");
 
     for i=1:neuralNetworksCount        
         [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, ...
@@ -39,7 +39,7 @@ function doTraining(neuralNetworks)
         start = start + neuralNetworks(i).numberOfEpochs;       
         %trainingFinalPredictions
         % Saving the weights
-        save("./ann_weigths/ann_weights_" + i + ".mat", "hiddenVsInputWeights", "hiddenVsInputBias", "outputVsHiddenWeights", "outputVsHiddenBias");
+        save("./ann_weights/ann_weights_" + i + ".mat", "hiddenVsInputWeights", "hiddenVsInputBias", "outputVsHiddenWeights", "outputVsHiddenBias");
     end  
     plot(1:totalEpochs, allNetworksErrors, 'o');
     hold on;

@@ -8,7 +8,7 @@ function test(phonemesCount)
     phonemeConfig.classFolderMap = containers.Map({1, 2, 3, 4, 5, 6}, {'../Data/Direita/DI/', '../Data/Direita/REI/', '../Data/Direita/TA/', ...
         '../Data/Esquerda/ES/', '../Data/Esquerda/QUER/', '../Data/Esquerda/DA/'});     
     predictions = string();
-    basic_information = load('.\ann_weigths\basic_info.mat');
+    basic_information = load('.\ann_weights\basic_info.mat');
     for i=1:phonemesCount
         phoneme = upper(input("Escolha um tipo de fonema: ", "s"));
         if(isKey(phonemeConfig.phonemClassMap, phoneme))
