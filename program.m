@@ -12,6 +12,7 @@ function doTraining(neuralNetworks)
     neuralNetworksCount = size(neuralNetworks, 2);
     [X_train, Y_train, X_val, Y_val, X_test, Y_test] = splitData(X_norm, Y);
     inputSize  = size(X, 2);
+    outputSize  = size(Y, 1);
 
     % Computa número total de epócas    
     totalEpochs = 0;            
@@ -23,7 +24,7 @@ function doTraining(neuralNetworks)
     start = 1;
     
     % Salva informações básicas
-    save("./ann_weigths/basic_info", "neuralNetworksCount", "inputSize");
+    save("./ann_weigths/basic_info", "neuralNetworksCount", "inputSize", "outputSize");
 
     for i=1:neuralNetworksCount        
         [hiddenVsInputWeights, hiddenVsInputBias, outputVsHiddenWeights, ...
