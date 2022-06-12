@@ -8,12 +8,13 @@ function [Y, prob] = testMLP(X)
 
     for i=1:neuralNetworksCount  
         neuralNetworkParameters = load(['.\ann_weights\ann_weights_' int2str(i) '.mat']);
+        activationType = neuralNetworkParameters.activationType;
         % ------- Hidden Layer -------      
         net_h = neuralNetworkParameters.hiddenVsInputWeights * X + neuralNetworkParameters.hiddenVsInputBias * ones(1, size(X, 2));
         Yh = activation(activationType, net_h);
         % ------- Output Layer -------
         net_o = neuralNetworkParameters.outputVsHiddenWeights * Yh + neuralNetworkParameters.outputVsHiddenBias * ones(1, size (Yh, 2));
-        Y_net = exp(net_o)./sum(exp(net_o))   % Aplicação da softmax   
+        Y_net = exp(net_o)./sum(exp(net_o));   % Aplicação da softmax   
         Y_net_sum = Y_net_sum + Y_net;
     end
 

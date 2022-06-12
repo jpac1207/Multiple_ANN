@@ -31,7 +31,7 @@ function doTraining(neuralNetworks)
             outputVsHiddenBias, finalErrors, finalValErrors, ...
             trainingFinalPredictions, validationFinalPredictions] = trainMLP(neuralNetworks(i).I, ...
             neuralNetworks(i).H, neuralNetworks(i).O, neuralNetworks(i).numberOfEpochs, ...,
-            neuralNetworks(i).eta, 0, X_train', Y_train, X_val', Y_val, neuralNetworks(i).isTheFirstNetwork);     
+            neuralNetworks(i).eta, neuralNetworks(i).activationType, X_train', Y_train, X_val', Y_val, neuralNetworks(i).isTheFirstNetwork);     
         allNetworksErrors(start:(start+neuralNetworks(i).numberOfEpochs-1), 1) = finalErrors;
         allNetworksValErrors(start:(start+neuralNetworks(i).numberOfEpochs-1), 1) = finalValErrors;
         Y_train = (Y_train .* (max(Y_train)-trainingFinalPredictions));
@@ -39,7 +39,8 @@ function doTraining(neuralNetworks)
         start = start + neuralNetworks(i).numberOfEpochs;       
         %trainingFinalPredictions
         % Saving the weights
-        save("./ann_weights/ann_weights_" + i + ".mat", "hiddenVsInputWeights", "hiddenVsInputBias", "outputVsHiddenWeights", "outputVsHiddenBias");
+        activationType = neuralNetworks(i).activationType;
+        save("./ann_weights/ann_weights_" + i + ".mat", "hiddenVsInputWeights", "hiddenVsInputBias", "outputVsHiddenWeights", "outputVsHiddenBias", "activationType");
     end  
     plot(1:totalEpochs, allNetworksErrors, 'o');
     hold on;
@@ -60,6 +61,7 @@ function[neuralNetworks] = getNeuralNetworks()
     neuralNetworks(1).eta = 0.1;
     neuralNetworks(1).numberOfEpochs = 500;
     neuralNetworks(1).isTheFirstNetwork = 1;
+    neuralNetworks(1).activationType = 0; % Flag para escolha de função de ativação dos neurônios escondidos. 0 para sigmoid e 1 para tanh.
     
     neuralNetworks(2).I = 30;
     neuralNetworks(2).H = 15;
@@ -67,6 +69,7 @@ function[neuralNetworks] = getNeuralNetworks()
     neuralNetworks(2).eta = 0.05;
     neuralNetworks(2).numberOfEpochs = 200;
     neuralNetworks(2).isTheFirstNetwork = 0;
+    neuralNetworks(1).activationType = 0; % Flag para escolha de função de ativação dos neurônios escondidos. 0 para sigmoid e 1 para tanh.
 
     neuralNetworks(3).I = 30;
     neuralNetworks(3).H = 25;
@@ -74,6 +77,7 @@ function[neuralNetworks] = getNeuralNetworks()
     neuralNetworks(3).eta = 0.01;
     neuralNetworks(3).numberOfEpochs = 100;
     neuralNetworks(3).isTheFirstNetwork = 0;
+    neuralNetworks(1).activationType = 0; % Flag para escolha de função de ativação dos neurônios escondidos. 0 para sigmoid e 1 para tanh.
 end
 
 % Realiza a divisão dos dados contidos em 'X' e 'Y' em:
